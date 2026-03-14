@@ -1,39 +1,47 @@
-import { useState } from 'react';
-import Header from './components/Header';
-import Footer from './components/Footer';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Layout from './components/Layout';
 import Home from './pages/Home';
 import About from './pages/About';
 import Services from './pages/Services';
 import Contact from './pages/Contact';
 import Resources from './pages/Resources';
-import { PageType } from './types';
+import AdminLogin from './pages/AdminLogin';
+import AdminDashboard from './pages/admin-dashboard'; // note the lowercase filename
+import ProtectedRoute from './components/ProtectedRoute';
+import PublicRoute from './components/PublicRoute';
 
 function App() {
-  const [currentPage, setCurrentPage] = useState<PageType>('home');
-
-  const renderPage = () => {
-    switch (currentPage) {
-      case 'home':
-        return <Home onNavigate={setCurrentPage} />;
-      case 'about':
-        return <About />;
-      case 'services':
-        return <Services onNavigate={setCurrentPage} />;
-      case 'contact':
-        return <Contact />;
-      case 'resources':
-        return <Resources onNavigate={setCurrentPage} />;
-      default:
-        return <Home onNavigate={setCurrentPage} />;
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-white flex flex-col">
-      <Header currentPage={currentPage} onNavigate={setCurrentPage} />
-      <main className="flex-1">{renderPage()}</main>
-      <Footer />
-    </div>
+    <BrowserRouter>
+      <Routes>
+        {/* Public pages with header/footer */}
+        <Route element={<Layout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/services" element={<Services />} />
+          <Route path="/resources" element={<Resources />} />
+          <Route path="/contact" element={<Contact />} />
+        </Route>
+
+        {/* Admin routes – no header/footer */}
+        <Route
+          path="/admin/login"
+          element={
+            <PublicRoute>
+              <AdminLogin />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/admin/dashboard"
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

@@ -1,109 +1,148 @@
-import { Menu, X, Phone } from 'lucide-react';
-import { useState } from 'react';
-import { PageType } from '../types';
+import { Menu, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
-interface HeaderProps {
-  currentPage: PageType;
-  onNavigate: (page: PageType) => void;
-}
-
-export default function Header({ currentPage, onNavigate }: HeaderProps) {
+export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const navItems: { label: string; page: PageType }[] = [
-    { label: 'Home', page: 'home' },
-    { label: 'About', page: 'about' },
-    { label: 'Services', page: 'services' },
-    { label: 'Resources', page: 'resources' },
-    { label: 'Contact', page: 'contact' },
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+  }, [mobileMenuOpen]);
+
+  const navItems: { label: string; path: string }[] = [
+    { label: 'HOME', path: '/' },
+    { label: 'ABOUT', path: '/about' },
+    { label: 'SERVICES', path: '/services' },
+    { label: 'RESOURCES', path: '/resources' },
+    { label: 'CONTACT', path: '/contact' },
   ];
 
-  const handleNavigate = (page: PageType) => {
-    onNavigate(page);
+  const handleNavigate = (path: string) => {
+    navigate(path);
     setMobileMenuOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const isActive = (path: string) => {
+    if (path === '/') {
+      return location.pathname === '/';
+    }
+    return location.pathname === path;
+  };
+
   return (
-    <header className="bg-white shadow-md sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center py-4">
-          <button
-            onClick={() => handleNavigate('home')}
-            className="flex items-center space-x-3 group"
-          >
-            <img 
-              src="/logo.png" 
-              alt="Suzstar Counseling Logo" 
-              className="h-12 w-auto object-contain"
-            />
-            <div className="text-left">
-              <h1 className="text-xl font-bold text-gray-900 group-hover:text-teal-600 transition">
-                Suzstar Counseling
-              </h1>
-              <p className="text-xs text-gray-600">Mental Health Hub</p>
-            </div>
-          </button>
+    <>
+      <header 
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          scrolled ? 'bg-white/95 backdrop-blur-sm shadow-sm py-2' : 'bg-white py-4'
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between">
+            {/* Logo */}
+            <button
+              onClick={() => handleNavigate('/')}
+              className="flex items-center space-x-3 group"
+            >
+              <img 
+                src="/logo.png" 
+                alt="Suzstar Counseling Logo" 
+                className="h-12 w-auto object-contain"
+              />
+              <div className="text-left">
+                <h1 className="text-xl font-bold text-gray-900 group-hover:text-teal-600 transition">
+                  Suzstar Counseling
+                </h1>
+                <p className="text-xs text-gray-600">Mental Health Hub</p>
+              </div>
+            </button>
 
-          <nav className="hidden md:flex space-x-8">
-            {navItems.map((item) => (
-              <button
-                key={item.page}
-                onClick={() => handleNavigate(item.page)}
-                className={`text-sm font-medium transition ${
-                  currentPage === item.page
-                    ? 'text-teal-600 border-b-2 border-teal-600'
-                    : 'text-gray-700 hover:text-teal-600'
-                } pb-1`}
-              >
-                {item.label}
-              </button>
-            ))}
-          </nav>
-
-          <a
-            href="tel:0799240254"
-            className="hidden md:flex items-center space-x-2 bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 transition"
-          >
-            <Phone size={18} />
-            <span className="text-sm font-medium">0799 240 254</span>
-          </a>
-
-          <button
-            className="md:hidden text-gray-700"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-        </div>
-
-        {mobileMenuOpen && (
-          <div className="md:hidden pb-4 border-t border-gray-200 pt-4">
-            <nav className="flex flex-col space-y-3">
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center space-x-1">
               {navItems.map((item) => (
                 <button
-                  key={item.page}
-                  onClick={() => handleNavigate(item.page)}
-                  className={`text-left px-4 py-2 rounded-lg transition ${
-                    currentPage === item.page
-                      ? 'bg-teal-50 text-teal-600 font-medium'
-                      : 'text-gray-700 hover:bg-gray-50'
-                  }`}
+                  key={item.path}
+                  onClick={() => handleNavigate(item.path)}
+                  className="relative px-4 py-2 text-sm font-medium tracking-wider text-gray-700 hover:text-teal-600 transition-colors duration-200 group"
                 >
                   {item.label}
+                  <span 
+                    className={`absolute bottom-0 left-0 h-0.5 bg-teal-600 transition-all duration-300 ${
+                      isActive(item.path) ? 'w-full' : 'w-0 group-hover:w-full'
+                    }`}
+                  />
                 </button>
               ))}
-              <a
-                href="tel:0799240254"
-                className="flex items-center space-x-2 bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 transition"
+            </nav>
+
+            {/* Mobile Menu Button */}
+            <button
+              className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              onClick={() => setMobileMenuOpen(true)}
+              aria-label="Open menu"
+            >
+              <Menu size={24} className="text-gray-700" />
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Mobile Menu Overlay */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 z-50 md:hidden">
+          <div 
+            className="absolute inset-0 bg-black/50 transition-opacity"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+          <div className="absolute right-0 top-0 bottom-0 w-64 bg-white shadow-xl">
+            <div className="flex items-center justify-between p-4 border-b">
+              <span className="font-semibold text-gray-900 tracking-wider">MENU</span>
+              <button
+                onClick={() => setMobileMenuOpen(false)}
+                className="p-2 rounded-lg hover:bg-gray-100"
               >
-                <Phone size={18} />
-                <span>0799 240 254</span>
-              </a>
+                <X size={20} className="text-gray-700" />
+              </button>
+            </div>
+            <nav className="p-4">
+              <ul className="space-y-2">
+                {navItems.map((item) => (
+                  <li key={item.path}>
+                    <button
+                      onClick={() => handleNavigate(item.path)}
+                      className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-200 tracking-wider font-medium ${
+                        isActive(item.path)
+                          ? 'bg-teal-50 text-teal-600'
+                          : 'text-gray-700 hover:bg-gray-50 hover:text-teal-600'
+                      }`}
+                    >
+                      {item.label}
+                    </button>
+                  </li>
+                ))}
+              </ul>
             </nav>
           </div>
-        )}
-      </div>
-    </header>
+        </div>
+      )}
+
+      {/* Spacer */}
+      <div className={`${scrolled ? 'h-14' : 'h-[72px]'} transition-all duration-300`} />
+    </>
   );
 }
