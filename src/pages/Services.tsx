@@ -41,7 +41,7 @@ export default function Services({ onNavigate }: ServicesProps) {
 
   const fetchServices = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/services/');
+      const response = await fetch('https://suzstar-backend.onrender.com/api/services/');
       if (!response.ok) {
         throw new Error('Failed to fetch services');
       }

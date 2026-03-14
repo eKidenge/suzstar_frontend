@@ -73,7 +73,7 @@ export default function Resources({ onNavigate }: ResourcesProps) {
 
   const fetchResources = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/resources/');
+      const response = await fetch('https://suzstar-backend.onrender.com/api/resources/');
       if (!response.ok) {
         throw new Error('Failed to fetch resources');
       }

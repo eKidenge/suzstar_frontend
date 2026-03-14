@@ -69,7 +69,7 @@ export default function About({ onNavigate }: AboutProps) {
 
   const fetchAboutData = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/about/');
+      const response = await fetch('https://suzstar-backend.onrender.com/api/about/');
       if (!response.ok) {
         throw new Error('Failed to fetch about data');
       }
@@ -83,7 +83,7 @@ export default function About({ onNavigate }: AboutProps) {
 
   const fetchSettings = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/homepage/');
+      const response = await fetch('https://suzstar-backend.onrender.com/api/homepage/');
       if (!response.ok) {
         throw new Error('Failed to fetch settings');
       }
